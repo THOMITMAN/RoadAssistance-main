@@ -1,0 +1,39 @@
+
+/*login page */
+.loginBox .logoLogin {
+    width: 200px;
+    /*height: 100px;*/
+}
+.loginType {
+    display: none;
+}
+.loginType.active {
+    display: block;
+}
+.loginBox .changeDiv {
+    margin: 15px 0;
+    font-size: 12px;
+    color: gray;
+}
+.loginBox .changeDivItem {
+    cursor: pointer;
+}
+.loginBox .resetPwd {
+    display: none;
+}
+
+.loginBox .backImgBox {
+    font-size: 20px;
+    margin-bottom: 30px;
+    cursor: pointer;
+}
+.loginBox .backImg {
+    width: 20px;
+}
+.loginBox .sendCode .ab-button {
+    /*height: 20px;*/
+    /*font-size: 12px;*/
+    position: absolute;
+    right: 10px;
+    top: -4px;
+}

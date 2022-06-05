@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="./css/common.css">
+  <link rel="stylesheet" href="./css/login.css">
+  <link rel="stylesheet" href="./css/getHelp.css">
+  <link rel="stylesheet" href="./css/user.css">
+  <link rel="stylesheet" href="./home.html">
+  <link rel="stylesheet" href="./login.html">
+  <link rel="stylesheet" href="./register.html">
+  <link rel="stylesheet" href="./getHelp.html">
+  <link rel="stylesheet" href="./payment.html">
+  <link rel="stylesheet" href="./membership.html">
+  <link rel="stylesheet" href="./order.html">
+  <link rel="stylesheet" href="./user.html">
+  <!--polyfill.min.js 支持老版本浏览器兼容es6 中的某些语法 下载地址 https://cdn.jsdelivr.net/npm/@babel/polyfill@7.12.1/lib/index.min.js -->
+  <script src="./js/lib/polyfill.min.js"></script>
+  <script src="./js/lib/jquery-3.6.0.min.js"></script>
+  <!--  document https://github.com/kamranahmedse/jquery-toast-plugin-->
+  <link rel="stylesheet" href="./js/lib/jquery.toast.min.css">
+  <script src="./js/lib/jquery.toast.min.js"></script>
+  <script src="./js/api/request.js"></script>
+  <script src="./js/api/homeApi.js"></script>
+  <script>
+    var myMap;
+    var service;
+    var infowindow;
+    var autocomplete;
+    var marker;
+    var infowindowContent;
+
+    function initialize() {
+      const center = {lat: -34.4054, lng: 150.8784};
+      var mapProp = {
+        center: new google.maps.LatLng(center),
+        zoom: 8,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+      myMap = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+      service = new google.maps.places.PlacesService(myMap);
+
+      // var options = {
+      //   types: ['(regions)'],
+      //   componentRestrictions: {country: "au"} // 2-letters code
+      // };
+      // autocomplete = new google.maps.places.Autocomplete(inputObject, options);
+
+      const card = document.getElementById("pac-card");
+
+      // myMap.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
+      // Create a bounding box with sides ~10km away from the center point
+      const defaultBounds = {
+        north: center.lat + 0.1,
+        south: center.lat - 0.1,
+        east: center.lng + 0.1,
+        west: center.lng - 0.1,
+      };
+      const input = document.getElementById("pac-input");
+      const options = {
+        bounds: defaultBounds,
+        componentRestrictions: {country: "au"},
+        fields: ["address_components", "geometry", "icon", "name"],
+        strictBounds: false,
+        types: ["establishment"],
+      };
+
+      autocomplete = new google.maps.places.Autocomplete(input, options);
+
+      // Set initial restriction to the greater list of countries.
+      autocomplete.setComponentRestrictions({
+        country: ["au"],
+      });
+      // -43.437494, 112.329092
+      const southwest = {lat: -43.437494, lng: 112.329092};
+      //-4.608857, 156.890809
+      const northeast = {lat: -4.608857, lng: 156.890809};
+      const newBounds = new google.maps.LatLngBounds(southwest, northeast);
+
+      autocomplete.setBounds(newBounds);
+
+      infowindow = new google.maps.InfoWindow();
+      infowindowContent = document.getElementById(
+        "infowindow-content"
+      );
+
+      infowindow.setContent(infowindowContent);
+
+      marker = new google.maps.Marker({
+        myMap,
+        anchorPoint: new google.maps.Point(0, -29),
+      });
+      autocomplete.addListener("place_changed", () => {
+        startSearch();
+      });
+
+    }
+
+    window.initialize = initialize;
+
+    function startSearch() {
+      infowindow.close();
+      marker.setVisible(false);
+
+      const place = autocomplete.getPlace();
+
+      if (!place.geometry || !place.geometry.location) {
+        // User entered the name of a Place that was not suggested and
+        // pressed the Enter key, or the Place Details request failed.
+        toastGlobal("No details available for input: '" + place.name + "'", {icon: 'warning'});
+        return;
+      }
+      createMarker(place);
+    }
+
+    function createMarker(place) {
+      if (!place.geometry || !place.geometry.location) return;
+      // const marker = new google.maps.Marker({
+      //   myMap,
+      //   position: place.geometry.location,
+      // });
+      //
+      // marker.setPosition(place.geometry.location);
+      // marker.setMap(myMap);
+      // marker.setVisible(true);
+
+      $('#locateX').text(place.geometry.location.lat);
+      $('#locateY').text(place.geometry.location.lng);
+
+      // If the place has a geometry, then present it on a map.
+      if (place.geometry.viewport) {
+        myMap.fitBounds(place.geometry.viewport);
+      } else {
+        myMap.setCenter(place.geometry.location);
+        myMap.setZoom(17); // Why 17? Because it looks good.
+      }
+
+      marker.setPosition(place.geometry.location);
+      marker.setMap(myMap);
+      marker.setVisible(true);
+
+      $('#locateX').text(place.geometry.location.lat);
+      $('#locateY').text(place.geometry.location.lng);
+
+      let address = "";
+
+      if (place.address_components) {
+        address = [
+          (place.address_components[0] &&
+            place.address_components[0].short_name) ||
+          "",
+          (place.address_components[1] &&
+            place.address_components[1].short_name) ||
+          "",
+          (place.address_components[2] &&
+            place.address_components[2].short_name) ||
+          "",
+        ].join(" ");
+      }
+
+      infowindowContent.children["place-icon"].src = place.icon;
+      infowindowContent.children["place-name"].textContent = place.name;
+      infowindowContent.children["place-address"].textContent = address;
+      infowindow.open(myMap, marker);
+    }
+
+  </script>
+</head>
+<body>
+<div class="navTopBox bottomShadow">
+  <div id="navNotLogin">
+    <div class="navTop ">
+      <div class="navLeft">
+        <div class="ab-tabs">
+          <div class="ab-tab" id="home">
+            <div class="ab-tab-text">Home</div>
+          </div>
+        </div>
+        <div class="ab-tabs-user" style="display: none;">
+          <div class="ab-tab is-active">
+            <div class="ab-tab-text">Be a rescuer</div>
+          </div>
+          <div class="ab-tab">
+            <div class="ab-tab-text">Be a customer</div>
+          </div>
+        </div>
+      </div>
+      <div class="navRight">
+        <div class="ab-tabs">
+          <div class="ab-tab" id="login">
+            <div class="ab-tab-text">Login in</div>
+          </div>
+          <div class="ab-tab" id="register">
+            <div class="ab-tab-text">Register</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="navHasLogin" class="navHasLogin">
+    <div class="navTop">
+      <div class="navLeft">
+        <div id="navC">
+          <div class="ab-tabs">
+            <div class="ab-tab" id="getHelp">
+              <div class="ab-tab-text">Get help</div>
+            </div>
+            <div class="ab-tab" id="payment">
+              <div class="ab-tab-text">Payment</div>
+            </div>
+            <div class="ab-tab" id="membership">
+              <div class="ab-tab-text">Membership</div>
+            </div>
+          </div>
+        </div>
+        <div id="navR">
+          <div class="ab-tabs">
+            <div class="ab-tab" id="resure">
+              <div class="ab-tab-text">Resure</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="navRight">
+        <div class="ab-tabs">
+          <div class="ab-tab" id="user">
+            <img src="./img/user.png" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="app"></div>
+<div id="appgethelp" style="display: none;">
+  <div class="getHelpPage">
+    <div id="mapInfo">
+      <div class="formInfo  step1">
+        <div class="ab-form-item column">
+          <div class="ab-form-item-label">Where are you? (locatiion)</div>
+          <div class="ab-form-item-content flex-between">
+            <div class="ab-input">
+              <!--            <div style="height: 50px;">-->
+              <!--            </div>-->
+              <div id="pac-card">
+                <input type="text" class="ab-input__inner locate" id="pac-input">
+              </div>
+              <div class="flex-between">
+                <div class="locateBox">
+                  <div>X: <span id="locateX"></span>   </div>
+                  <div style="margin-left: 20px;">Y: <span id="locateY"></span></div>
+                </div>
+                <button class="ab-button ab-button--primary ab-button--mini" id="getCenter">Get GPS</button>
+              </div>
+              <div style="display: none;">
+                <div id="infowindow-content">
+                  <img src="" width="16" height="16" id="place-icon"/>
+                  <span id="place-name" class="title"></span><br/>
+                  <span id="place-address"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ab-form-item column">
+          <div class="ab-form-item-label">Phone Numebr</div>
+          <div class="ab-form-item-content flex-between">
+            <div class="ab-input">
+              <input type="text" class="ab-input__inner phone">
+            </div>
+          </div>
+        </div>
+        <div class="otherBox">
+          <div class="ab-form-item column">
+            <div class="ab-form-item-label">What problem with your car?</div>
+            <div class="ab-form-item-content">
+              <div class="problemBox">
+                <div class="imgItem">
+                  <img src="./img/prob1.png" alt="">
+                  <span>flat batteries</span>
+                  <input class="imgItemCheckbox" value="1" type="checkbox" name="imgItem">
+                </div>
+                <div class="imgItem">
+                  <img src="./img/prob2.png" alt="">
+                  <span>flat tyres</span>
+                  <input class="imgItemCheckbox" value="2" type="checkbox" name="imgItem">
+                </div>
+                <div class="imgItem">
+                  <img src="./img/prob3.png" alt="">
+                  <span>towing</span>
+                  <input class="imgItemCheckbox" value="3" type="checkbox" name="imgItem">
+                </div>
+                <div class="imgItem">
+                  <img src="./img/prob4.png" alt="">
+                  <span>locked</span>
+                  <input class="imgItemCheckbox" value="4" type="checkbox" name="imgItem">
+                </div>
+                <div class="imgItem">
+                  <img src="./img/prob5.png" alt="">
+                  <span> fuel delivery</span>
+                  <input class="imgItemCheckbox" value="5" type="checkbox" name="imgItem">
+                </div>
+              </div>
+              <div class="smallProblem">
+                <div class="ab-form-item column">
+                  <div class="ab-form-item-label">Other problem</div>
+                  <div class="ab-form-item-content flex-between">
+                    <div class="ab-input">
+                      <input type="text" class="ab-input__inner description" placeholder="Problem Description">
+                    </div>
+                  </div>
+                </div>
+                <div class="ab-form-item column">
+                  <div class="ab-form-item-label">Rego Number</div>
+                  <div class="ab-form-item-content flex-between">
+                    <div class="ab-input">
+                      <input type="text" class="ab-input__inner rego">
+                    </div>
+                  </div>
+                </div>
+                <div class="ab-form-item column">
+                  <div class="ab-form-item-label">Other information</div>
+                  <div class="ab-form-item-content flex-between">
+                    <div class="ab-input">
+                      <input type="text" class="ab-input__inner other">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="ab-button ab-button--primary full" id="submitMapInfo">SUBMIT</button>
+      </div>
+      <div class="submitSuccess step2">
+        <div class="successCon">
+          <div class="successConTop">
+            Rescue order has been sent
+          </div>
+          <div>
+            <img class="successImg" src="./img/success.png" alt="">
+          </div>
+          <div class="successConTop">Please wait for the rescuer to take the order</div>
+          <div class="loadingBox">
+            <img src="./img/loading.gif" alt="">
+          </div>
+          <div class="redTip">Please wait in a safe area to avoid secondary injury</div>
+        </div>
+      </div>
+      <div class="submitSuccess step3">
+        <div class="successCon">
+          <div class="successConTop">
+            successfully received the order
+          </div>
+          <div class="successConTop">Maintenance staff will arrive in 3 minutes</div>
+          <div>
+            <img class="successImg" src="./img/success.png" alt="">
+          </div>
+          <div class="redTip">Please wait in a safe area to avoid secondary injury</div>
+        </div>
+      </div>
+      <div class="submitSuccess step4">
+        <div class="successCon">
+          <div class="successConTop">
+            Waiting for Order Payment
+          </div>
+          <button class="ab-button ab-button--primary ab-button--large" id="toPay">Click to Payment Page</button>
+        </div>
+      </div>
+      <div class="submitSuccess step5">
+        <div class="successCon">
+          <div class="successConTop">
+            Your car has been Fixed
+          </div>
+          <div class="mt20 leaveText">Please Leave your Review and rating</div>
+          <div class="ab-form-item full column mt20">
+            <div class="ab-form-item-label">Review:</div>
+            <div class="ab-form-item-content flex-between">
+              <div class="ab-input">
+                <textarea type="textarea" class="ab-input__inner phone"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="ab-form-item full column mt20">
+            <div class="ab-form-item-label">Rating:</div>
+            <div class="ab-form-item-content flex-between">
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mapBox" id="map">
+  <div id="googleMap" style="width:100%;height:100%;"></div>
+</div>
+<div id="loadingBox" class="loadingBox">
+  <div class="loadingCon">
+    <img src="./img/loading.gif" alt="">
+  </div>
+</div>
+<script src="./js/lib/router2.js"></script>
+<script>
+  // 全局共用 js
+  var abLib = {
+    showLoading: function () {
+      $('.loadingBox').show();
+    },
+    hideLoading: function () {
+      $('.loadingBox').hide();
+    },
+  }
+  var userIdKey = 'userId';
+  // 保存全局变量
+  var store = {};
+  // 初始化路由
+  routes = [
+    {
+      path: '/',
+      html: '/home.html',
+      js: '/js/home.js',
+    },
+    {
+      path: '/login',
+      html: '/login.html',
+      js: '/js/login.js',
+    },
+    {
+      path: '/register',
+      html: '/register.html',
+      js: '/js/register.js',
+    },
+    {
+      path: '/order',
+      html: '/order.html',
+      js: '/js/order.js',
+    },
+    {
+      path: '/getHelp',
+      // html: '/getHelp.html',
+      // js: '/js/getHelp.js',
+    },
+    {
+      path: '/membership',
+      html: '/membership.html',
+      js: '/js/membership.js',
+    },
+    {
+      path: '/payment',
+      html: '/payment.html',
+      js: '/js/payment.js',
+    },
+    {
+      path: '/user',
+      html: '/user.html',
+      js: '/js/user.js',
+    },
+  ];
+
+  function beforeNavTop(url) {
+    // abLib.showLoading();
+  }
+
+  function setNavTop(url) {
+    var userId = localStorage.getItem(userIdKey);
+    // var notLogin = ['/', '/login', '/register']
+    // if (!userId && !notLogin.includes(url)) {
+    //   router.push('/login')
+    //   return;
+    // }
+    // abLib.hideLoading();
+    $('.mapBox').hide();
+    $('body').removeClass('bodyBg');
+    $('.ab-tabs-user').hide();
+    resetActive()
+    if (url == '/') {
+      $('#navNotLogin').show();
+      $('#navHasLogin').hide();
+      $('.navRight').find('.ab-tab').removeClass('is-active');
+      $('#home').addClass('is-active');
+    } else if (url == '/login') {
+      $('#navNotLogin').show();
+      $('#navHasLogin').hide();
+      $('#home').removeClass('is-active');
+      $('#login').addClass('is-active');
+
+      $('.ab-tabs-user').find('.ab-tab').eq(0).addClass('is-active');
+      $('body').addClass('bodyBg');
+      $('.ab-tabs-user').show();
+    } else if (url == '/register') {
+      $('#navNotLogin').show();
+      $('#navHasLogin').hide();
+      $('#register').addClass('is-active');
+      $('#home').removeClass('is-active');
+
+      $('.ab-tabs-user').find('.ab-tab').eq(0).addClass('is-active');
+      $('body').addClass('bodyBg');
+      $('.ab-tabs-user').show();
+    } else if (url == '/order') {
+      $('#navNotLogin').hide();
+      $('#navHasLogin').show();
+      $('#navC').hide();
+      $('#navR').show();
+      $('#resure').addClass('is-active');
+      $('body').addClass('bodyBg');
+    } else if (url == '/getHelp') {
+      $('.mapBox').show();
+      $('#navNotLogin').hide();
+      $('#navHasLogin').show();
+      $('#navC').show();
+      $('#navR').hide();
+      $('#getHelp').addClass('is-active');
+    } else if (url == '/membership') {
+
+      $('#navNotLogin').hide();
+      $('#navHasLogin').show();
+      $('#navC').show();
+      $('#navR').hide();
+      $('#membership').addClass('is-active');
+    } else if (url == '/payment') {
+      $('.mapBox').show();
+      $('#navNotLogin').hide();
+      $('#navHasLogin').show();
+      $('#navC').show();
+      $('#navR').hide();
+      $('#payment').addClass('is-active');
+    } else if (url == '/user') {
+
+      $('#navNotLogin').hide();
+      $('#navHasLogin').show();
+      $('#user').addClass('is-active');
+      $(".navLeft").find(".ab-tab").removeClass('is-active');
+
+      var userTypeTo = localStorage.getItem('userType');
+      if (userTypeTo == 'c') {
+        $('#navC').show();
+        $('#navR').hide();
+      } else {
+        $('#navC').hide();
+        $('#navR').show();
+      }
+    }
+
+  }
+
+
+  function resetActive() {
+    $('.navTopBox').find('.ab-tab').removeClass('is-active');
+  }
+
+  // 导航栏
+  $('body').on('click', '#login', () => {
+    router.push('/login');
+  })
+  $('body').on('click', '#register', () => {
+    router.push('/register');
+  })
+  $('body').on('click', '#home', () => {
+    router.push('/');
+  })
+  $('body').on('click', '#getHelp', () => {
+    router.push('/getHelp');
+  })
+  $('body').on('click', '#payment', () => {
+    router.push('/payment');
+  })
+  $('body').on('click', '#membership', () => {
+    router.push('/membership');
+  })
+  $('body').on('click', '#membership', () => {
+    router.push('/membership');
+  })
+  $('body').on('click', '#resure', () => {
+    router.push('/order');
+  })
+
+  $('body').on('click', '#user', () => {
+    router.push('/user');
+  })
+  $('body').on('click', '#logout', () => {
+  })
+
+
+  function loadScript() {
+    // my:   AIzaSyAs8VzhaChJnxS--MZU6mLVysVbfMAWcus
+    // eg.   AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg
+    // their: AIzaSyAfrTnaJLiQX7oUYSCysaXPRE6mq_XzCqY
+    // console.log('mapgoogle');
+    let id = 'googlemapjs'
+    let url = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAfrTnaJLiQX7oUYSCysaXPRE6mq_XzCqY&libraries=places&callback=initialize";
+    let routerId = document.getElementById(id);
+    if (!routerId) {
+      let script = document.createElement("script");
+      script.type = "text/JavaScript";
+      script.id = id;
+      script.src = url;
+      document.getElementsByTagName('body')[0].appendChild(script);
+    } else {
+      initialize();
+    }
+  }
+
+</script>
+<script>
+  // tabs 公用js
+  $('body').on('click', '.ab-tabs .ab-tab', function () {
+    // router.push('/');
+    $(this).siblings().removeClass('is-active');
+    $(this).addClass('is-active');
+    var index = $(this).parent().find('.ab-tab').index(this);
+    var showTab = $(this).parent().siblings('.ab-tabs-con').find('.ab-tab').eq(index);
+    showTab.siblings().removeClass('is-active');
+    showTab.addClass('is-active');
+  })
+  $('body').on('click', '.ab-tabs-user .ab-tab', function () {
+    // router.push('/');
+    $('.ab-tabs-user .ab-tab').siblings().removeClass('is-active');
+    $(this).addClass('is-active');
+    var index = $(this).parent().find('.ab-tab').index(this);
+    var showTab = $('.ab-tabs-con').find('.ab-tab').eq(index);
+    var showTab2 = $('.formBoxRight').find('.ab-tab').eq(index);
+    showTab2.addClass('is-active');
+    showTab.siblings().removeClass('is-active');
+    showTab.addClass('is-active');
+  })
+
+
+  function toastGlobal(text, options) {
+    $.toast({
+      text: text,
+      // heading: 'Information',
+      position: 'top-center',
+      // info, warning, error, success
+      icon: options && options.icon ? options.icon : 'success',
+    })
+    // myToast.update('ok');
+  }
+
+</script>
+<script src="./js/getHelp.js"></script>
+</body>
+</html>

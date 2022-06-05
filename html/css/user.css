@@ -1,0 +1,50 @@
+
+/*user page */
+.userPage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.userPage .userLeft {
+    width: 400px;
+    padding: 14px;
+    font-size: 28px;
+    text-align: center;
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+}
+.userPage .userRight {
+    width: 400px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.userPage .logoRight {
+    display: flex;
+    justify-content: center;
+}
+.userPage .userRight img {
+    width: 240px;
+    display: flex;
+    justify-content: center;
+}
+.userPage .userRight {
+    font-size: 28px;
+    text-align: center;
+}
+.userPage .profile {
+    font-size: 28px;
+    text-align: center;
+}
+.userPage .ab-form-item {
+    font-size: 16px;
+}
+.userPage .ab-form-item-label {
+    width: 140px;
+}
+.userPage .ab-form-item-content {
+    text-align: left;
+}
+.userPage .logoutBox {
+    padding: 14px;
+}

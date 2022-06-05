@@ -1,0 +1,220 @@
+.getHelpPage {
+    width: 100%;
+    height: calc(100vh - 70px);
+}
+
+#mapInfo {
+    position: fixed;
+    left: 30px;
+    top: 70px;
+    bottom: 50px;
+    width: 400px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    overflow-y: auto;
+    z-index: 10;
+}
+.mapInfo2 {
+    position: fixed;
+    left: 470px;
+    top: 70px;
+    bottom: 50px;
+    width: 400px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.getHelpPage .formInfo {
+    padding: 10px;
+}
+
+.getHelpPage .locateBox {
+    display: flex;
+    align-items: center;
+}
+
+.getHelpPage .problemBox {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    font-size: 12px;
+}
+
+.problemBox .imgItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.problemBox .imgItem.active {
+    color: blue;
+    border: 1px solid blue;
+    background-color: pink;
+}
+
+.problemBox .imgItem .imgItemCheckbox {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.getHelpPage .otherBox {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #cccccc;
+}
+
+.getHelpPage .smallProblem .ab-form-item {
+    margin-top: 10px;
+}
+.step2 {
+    display: none;
+}
+.step3 {
+    display: none;
+}
+.step4 {
+    display: none;
+}
+.step5 {
+    display: none;
+}
+.submitSuccess {
+    padding: 14px;
+}
+
+.submitSuccess .successCon {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.successConTop {
+    font-size: 36px;
+}
+.successImg {
+    margin: 20px 0;
+    width: 60px;
+}
+.loadingBox {
+    margin: 30px 0;
+}
+.loadingBox img {
+    width: 100px;
+}
+.redTip {
+    color: red;
+    font-size: 14px;
+}
+
+.submitSuccess .style1 {
+    font-size: 36px;
+}
+
+.submitSuccess .style1 {
+    font-size: 36px;
+}
+.leaveText {
+    margin: 50px 0;
+}
+
+
+
+
+/*payment*/
+.paymentPage .ab-form-item-label  {
+    width: 120px;
+}
+.paymentPage .payIcon {
+    width: 60px;
+}
+
+
+
+.memberPage .logoImg {
+    /* position: fixed;
+    top: 80px;
+    left: 30px; */
+    width: 200px;
+}
+.memberPage .title {
+    font-size: 40px;
+    padding-top: 50px;
+}
+.memberPage .content {
+    text-align: center;
+    margin-left: 40px;
+}
+.memberPage .title-desc {
+    font-size: 18px;
+    padding-top: 20px;
+}
+.memberPage .typeBox {
+    margin-top: 80px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    text-align: center;
+}
+.memberPage .typeItem {
+    border: 1px solid #cccccc;
+    padding: 10px;
+    display: flex;
+    width: 360px;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 30px;
+    margin-bottom: 20px;
+}
+.memberPage .typeTitle {
+    font-size: 36px;
+    font-weight: bold;
+}
+.memberPage .amount {
+    font-size: 60px;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+.memberPage .amountUnit {
+    font-size: 24px;
+}
+.memberPage .amountDesc {
+    font-size: 36px;
+    margin-top: 20px;
+}
+
+
+.orderPage .logoImg {
+    width: 500px;
+    border-radius: 20px;
+}
+.orderPage .logoImgBox {
+    margin-left: 50px;
+}
+.orderPage .submitSuccess {
+    background-color: #ffffff;
+    border-radius: 20px;
+}
+.orderPage .ab-form-item-label {
+    width: 180PX;
+}
+.orderPage .wait {
+    color: rgba(128, 128, 128, 1);
+    font-size: 36px;
+}
+.orderPage .submitSuccess {
+    min-height: 445px;
+}
+
+
+
